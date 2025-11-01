@@ -2,21 +2,24 @@ import styles from "./header.module.css";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { uppercase, trim } from "../../helpers/stringHelpers";
 import { useState } from "react";
-import { TAssignment } from "../../interfaces";
+import {createAssignment, getAssignments} from "../../controllers/AssignmentController";
+import {TAssignment} from "../../interfaces";
+//import { TAssignment } from "../../interfaces";
 
 type Props = {
-  setAssignments: React.Dispatch<React.SetStateAction<TAssignment[]>>;
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+    setAssignments: React.Dispatch<React.SetStateAction<TAssignment[]>>;
 };
 
-export function Header({ setAssignments }: Props) {
+export function Header({setLoading, setAssignments}: Props) {
   const [assignment, setAssignment] = useState("");
-  const handleCreateButton = (e: React.FormEvent) => {
+  const handleCreateButton = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAssignments((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), task: assignment, completed: false },
-    ]);
+    setLoading(true);
+    await createAssignment(assignment);
+    setAssignments(await getAssignments());
     setAssignment("");
+    setLoading(false);
   };
 
   return (

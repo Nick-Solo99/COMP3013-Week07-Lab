@@ -1,26 +1,26 @@
 import { TAssignment } from "../../interfaces";
 import { Assignment } from "../Assignment";
+import { getAssignments, deleteAssignment, toggleAssignment } from "../../controllers/AssignmentController";
 import styles from "./assignments.module.css";
 
 type Props = {
   assignments: TAssignment[];
   setAssignments: React.Dispatch<React.SetStateAction<TAssignment[]>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
-export function Assignments({ assignments, setAssignments }: Props) {
+export function Assignments({ assignments, setAssignments, setLoading }: Props) {
   const handleDeleteButton = async (id: string) => {
-    const updatedAssignmentList = assignments.filter(
-      (assignment) => assignment.id !== id
-    );
-    setAssignments(updatedAssignmentList);
+      setLoading(true);
+      await deleteAssignment(id);
+      setAssignments(await getAssignments());
+      setLoading(false);
   };
-  const handleCompletedTask = (id: string, complete: boolean) => {
+  const handleCompletedTask = async (id: string) => {
     // toggle the completion state on the server
-    const updatedAssignmentList = assignments.map((assignments) =>
-      assignments.id === id
-        ? { ...assignments, completed: complete }
-        : assignments
-    );
-    setAssignments(updatedAssignmentList);
+      setLoading(true);
+      await toggleAssignment(id);
+      setAssignments(await getAssignments());
+      setLoading(false);
   };
   const countCompletedTasks = () => {
     return assignments.filter((assignment) => assignment.completed).length;
